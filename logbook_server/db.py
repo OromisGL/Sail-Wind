@@ -6,9 +6,11 @@ from flask import current_app, g
 
 def get_db():
     if 'db' not in g:
-        db_connection_string = current_app.config['DATABASE']
-        g.client = MongoClient(db_connection_string)
-
+        if not current_app.config['TESTING']:
+            db_connection_string = current_app.config['DATABASE']
+            g.client = MongoClient(db_connection_string)
+        else:
+            g.client = current_app.config['DATABASE']
         g.db = g.client.test
     return g.db
 
@@ -16,6 +18,7 @@ def get_db():
 def close_db(e=None):
     client = g.pop('client', None)
     if client is not None:
+        print(client)
         client.close()
 
 def init_db():

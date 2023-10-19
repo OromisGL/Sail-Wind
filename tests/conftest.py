@@ -6,6 +6,7 @@ from logbook_server import create_app
 def app():
     app = create_app({
         'TESTING': True,
+        'DATABASE': mongomock.MongoClient()
     })
     yield app
 
