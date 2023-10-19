@@ -8,9 +8,14 @@ dependencies = [
 ]
 
 [build-system]
-requires = [
-    "flit_core<4",
-    "pytest",
-    "coverage"
-]
+requires = ["flit_core<4"]
+    
 build-backend = "flit_core.buildapi"
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "coverage",
+    "pytest-mongodb"
+]
+
