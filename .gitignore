@@ -9,4 +9,7 @@ dist/
 build/
 *.egg-info/
 .idea
-
+bin
+lib
+lib64
+pyvenv.cfg
