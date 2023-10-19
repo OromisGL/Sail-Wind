@@ -6,7 +6,8 @@ from flask import current_app, g
 
 def get_db():
     if 'db' not in g:
-        g.client = MongoClient('mongodb://root:example@172.18.0.2')
+        db_connection_string = current_app.config['DATABASE']
+        g.client = MongoClient(db_connection_string)
 
         g.db = g.client.test
     return g.db

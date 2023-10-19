@@ -1,0 +1,1 @@
+DATABASE='mongodb://root:example@172.18.0.2'
