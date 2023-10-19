@@ -1,0 +1,16 @@
+[project]
+name = "flaskr"
+version = "1.0.0"
+description = "The basic blog app built in the Flask tutorial."
+dependencies = [
+    "flask",
+    "pymongo>=4.3.2"
+]
+
+[build-system]
+requires = [
+    "flit_core<4",
+    "pytest",
+    "coverage"
+]
+build-backend = "flit_core.buildapi"
