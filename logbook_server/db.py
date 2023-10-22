@@ -9,13 +9,15 @@ def get_db():
         if not current_app.config['TESTING']:
             db_connection_string = current_app.config['DATABASE']
             g.client = MongoClient(db_connection_string)
+            g.db = g.client.test
         else:
-            g.client = current_app.config['DATABASE']
-        g.db = g.client.test
+            g.db = current_app.config['DATABASE']
     return g.db
 
 
 def close_db(e=None):
+    if current_app.config['TESTING']:
+        return
     client = g.pop('client', None)
     if client is not None:
         print(client)
