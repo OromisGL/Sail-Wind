@@ -6,32 +6,18 @@ def test_user_fixtures(mongodb):
 def test_register(app):
     pass 
 
-def test_unauth(client, mongodb):
-    track = mongodb.tracks.find_one({'tmp_id': '1'})
-    assert client.get(f"/track/{track['_id']}/update").status_code == 302
+def test_login(auth, client):
+    assert auth.login().headers.get("Set-Cookie").startswith("session=")
 
-def test_permission_denied(auth, client, mongodb):
-    #assert 0
-    print(auth.login())
-    track = mongodb.tracks.find_one({'tmp_id': '2'})
-    #id = track[]
-    assert client.get(f"/track/{track['_id']}/update").status_code == 403
+def test_logout(auth):
+    auth.login()
+    assert auth.logout().headers.get("Set-Cookie").startswith("session=; Expires=")
 
-def test_permission_granted(auth, client, mongodb):
-    #assert 0
-    print(auth.login())
-    track = mongodb.tracks.find_one({'tmp_id': '1'})
-    #id = track[]
-    assert client.get(f"/track/{track['_id']}/update").status_code == 200
-
-
-
-
-    
-
-
-
-
-    
-
-    
+def test_requires_login(auth, client):
+    unauth_resp = client.get(f"/track/")
+    assert unauth_resp.location == "/auth/login"
+    assert unauth_resp.status_code == 302
+    auth.login()
+    auth_resp = client.get(f"/track/")
+    assert auth_resp.location == None
+    assert auth_resp.status_code == 200
