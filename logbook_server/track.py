@@ -7,7 +7,7 @@ from werkzeug.exceptions import abort
 from logbook_server.auth import login_required
 from logbook_server.db import get_db
 
-bp = Blueprint('blog', __name__)
+bp = Blueprint('track', __name__, url_prefix='/track')
 
 
 @bp.route('/')
@@ -15,7 +15,7 @@ bp = Blueprint('blog', __name__)
 def index():
     db = get_db()
     posts = list(db.tracks.find({"created_by": g.user["user_name"]}))
-    return render_template('blog/index.html', posts=posts)
+    return render_template('track/index.html', posts=posts)
 
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
@@ -38,8 +38,8 @@ def create():
             }
             db = get_db()
             db.tracks.insert_one(track)
-            return redirect(url_for('blog.index'))
-    return render_template('blog/create.html')
+            return redirect(url_for('track.index'))
+    return render_template('track/create.html')
 
 def get_post(id, check_author=True):
     post = get_db().tracks.find_one({"_id": id})
@@ -74,9 +74,9 @@ def update(id):
                 {"_id": post["_id"]},
                 {"$set":{"title": title, "description": description}}
             )
-            return redirect(url_for('blog.index'))
+            return redirect(url_for('track.index'))
 
-    return render_template('blog/update.html', post=post)
+    return render_template('track/update.html', post=post)
 
 
 @bp.route('/<string:id>/delete', methods=('POST',))
@@ -85,4 +85,4 @@ def delete(id):
     id = ObjectId(id)
     get_post(id)
     db = get_db().tracks.delete_one({"_id": id})
-    return redirect(url_for('blog.index'))
+    return redirect(url_for('track.index'))
