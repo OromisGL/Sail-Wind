@@ -9,10 +9,12 @@ def test_register(app):
 def test_unauth(client):
     assert client.get('/653172eed1fc3ba0f0013bee/update').status_code == 302
 
-def test_permission_denied(auth, client):
+def test_permission_denied(auth, client, mongodb):
     #assert 0
     print(auth.login())
-    assert client.get('/653172eed1fc3ba0f0013bee/update').status_code == 401
+    track = mongodb.tracks.find_one({'tmp_id': '2'})
+    #id = track[]
+    assert client.get(f"/{track['_id']}/update").status_code == 403
 
 
 

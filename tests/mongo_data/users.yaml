@@ -1,3 +1,6 @@
 - user_name: test
   password: scrypt:32768:8:1$5O7qmlO8tze0lOH1$491a0c8f1e3b4b82582b473a18e4088baf0452c67bd147cf59da54b4eafaa775aeeda0538f8bc38855314c7982548ef5d65f74d2b734a24ae0601f7676d1987e
   cleartext_pw: test
+- user_name: test2
+  password: scrypt:32768:8:1$5O7qmlO8tze0lOH1$491a0c8f1e3b4b82582b473a18e4088baf0452c67bd147cf59da54b4eafaa775aeeda0538f8bc38855314c7982548ef5d65f74d2b734a24ae0601f7676d1987e
+  cleartext_pw: test
