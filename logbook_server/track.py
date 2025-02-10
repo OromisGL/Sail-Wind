@@ -7,6 +7,9 @@ from werkzeug.exceptions import abort
 from logbook_server.auth import login_required
 from logbook_server.db import get_db
 
+from logbook_server.map_utils import build_map
+
+
 bp = Blueprint('track', __name__, url_prefix='/track')
 
 
@@ -15,7 +18,9 @@ bp = Blueprint('track', __name__, url_prefix='/track')
 def index():
     db = get_db()
     posts = list(db.tracks.find({"created_by": g.user["user_name"]}))
-    return render_template('track/index.html', posts=posts)
+    the_map = build_map('/home/oromis/fahrtenbuch-plot/2022/2022-07-29_segeln_Steffen_elli') # going to be replaced by useres file.gpx
+    # print(the_map._repr_html_())
+    return render_template('track/index.html',the_map=the_map._repr_html_(), posts=posts)
 
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required

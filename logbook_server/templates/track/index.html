@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 
 {% block header %}
-<h1>{% block title %}Posts{% endblock %}</h1>
+<h1>{% block title %}Tracks{% endblock %}</h1>
 {% if g.user %}
-<a class="action" href="{{ url_for('track.create') }}">New</a>
+<a class="action" href="{{ url_for('track.create') }}">New Track</a>
 {% endif %}
 {% endblock %}
 
@@ -20,7 +20,9 @@
         {% endif %}
     </header>
     <p class="body">{{ post['body'] }}</p>
+    <div id="map">{{ the_map|safe }}</div>
 </article>
+
 {% if not loop.last %}
 <hr>
 {% endif %}
