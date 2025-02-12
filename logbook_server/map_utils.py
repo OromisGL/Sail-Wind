@@ -14,7 +14,7 @@ linear.caption = RELABEL.get(color_by, color_by)
 
 def build_map(path):
     the_map = create_folium_map(tiles='openstreetmap')
-    for track in read_gpx_file(path+".gpx"):
+    for track in read_gpx_file(path):
         for i, segment in enumerate(track['segments']):
             line = folium.ColorLine(positions=segment['latlon'], colormap=linear,
                                     colors=segment[color_by][:-1], control=False, **line_options)

@@ -15,12 +15,15 @@
             <h1>{{ post['title'] }}</h1>
             <div class="about">by {{ post['created_by'] }} on {{ post['_id'].generation_time.strftime('%Y-%m-%d') }}</div>
         </div>
+        {% if post._id %}
+            <div id="map">{{ maps[post._id]|safe }}</div>
+        {% endif %}
         {% if g.user['id'] == post['author_id'] %}
         <a class="action" href="{{ url_for('track.update', id=post['_id']) }}">Edit</a>
         {% endif %}
     </header>
     <p class="body">{{ post['body'] }}</p>
-    <div id="map">{{ the_map|safe }}</div>
+    
 </article>
 
 {% if not loop.last %}
