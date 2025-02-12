@@ -23,7 +23,7 @@ def allowed_file(filename):
 @login_required
 def index():
     db = get_db()
-    posts = list(db.tracks.find({"created_by": g.user["user_name"]}, {"file": 1}))
+    posts = list(db.tracks.find({"created_by": g.user["user_name"]}, {"file": 1, "created_by": 1, "title": 1, "description": 1}))
     maps = {}
     
     for post in posts:

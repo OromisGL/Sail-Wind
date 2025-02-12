@@ -1,15 +1,19 @@
 {% extends 'base.html' %}
 
-{% block header %}
-<h1>{% block title %}Log In{% endblock %}</h1>
+
+{% block title %}
+    Log In
 {% endblock %}
 
+
 {% block content %}
-<form method="post">
-    <label for="username">Username</label>
-    <input name="username" id="username" required>
-    <label for="password">Password</label>
-    <input type="password" name="password" id="password" required>
-    <input type="submit" value="Log In">
+<form action="{{ url_for('auth.login') }}" method="post">
+    <div class="mb-3">
+            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="username" id="username" placeholder="Username" type="text">
+        </div>
+        <div class="mb-3">
+            <input class="form-control mx-auto w-auto" name="password" placeholder="Password" type="password" id="password" required>
+        </div>
+        <button class="btn btn-primary" type="submit">Log In</button>
 </form>
 {% endblock %}
