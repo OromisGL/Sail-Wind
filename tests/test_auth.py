@@ -9,6 +9,10 @@ def test_register(app):
 def test_login(auth, client):
     assert auth.login().headers.get("Set-Cookie").startswith("session=")
 
+def test_login_non_existing_user(auth, client):
+    print(auth.login(username="nonexistend"))
+    assert False
+
 def test_logout(auth):
     auth.login()
     assert auth.logout().headers.get("Set-Cookie").startswith("session=; Expires=")
