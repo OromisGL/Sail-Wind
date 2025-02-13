@@ -8,13 +8,22 @@
 
 {% block content %}
   <form method="post" enctype="multipart/form-data">
-    <label for="title">Title</label>
-    <input name="title" id="title" value="{{ request.form['title'] }}" required>
-    <label for="description">description</label>
-    <textarea name="description" id="description">{{ request.form['description'] }}</textarea>
-    <label>Upload File</label>
-    <input type=file name=file>
-    <input type=submit value=Upload>
-    <input type="submit" value="Save">
+    <div class="form-control mx-auto w-auto">
+      <div class="mb-3">
+        <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="title" id="title" placeholder="Title" value="{{ request.form['title'] }}" required>
+      </div>
+      <div class="mb-3">
+        <textarea class="form-control mx-auto w-auto" name="description" placeholder="Description" id="description">{{ request.form['description'] }}</textarea>
+      </div>
+      <div class="mb-3">
+        <label>Upload File</label>
+      </div>
+      <div class="mb-3">
+        <input class="form-control mx-auto w-auto" type="file" name="file" id="file" required>
+      </div>
+        <div class="mb-3">
+        <button type="submit" class="btn btn-primary">Post</button>
+      </div>
+    </div>  
   </form>
 {% endblock %}

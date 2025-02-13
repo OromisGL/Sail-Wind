@@ -10,7 +10,6 @@ from logbook_server.auth import login_required
 from logbook_server.db import get_db
 from logbook_server.map_utils import build_map
 
-
 UPLOAD_FOLDER = 'uploads/'
 ALLOWED_EXTENSIONS = {'gpx'}
 
@@ -104,22 +103,40 @@ def update(id):
     if request.method == 'POST':
         title = request.form['title']
         description = request.form['description']
+        file = request.files['file']
         error = None
 
         if not title:
             error = 'Title is required.'
+        
+        old_file = post.get("file", "")
+        new_file_name = old_file
+        
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(UPLOAD_FOLDER, filename)
+            
+            if old_file:
+                old_file_path = os.path.join(UPLOAD_FOLDER, old_file)
+                if os.path.exists(old_file_path):
+                    os.remove(old_file_path)
+                            
+            file.save(file_path)
+            new_file_name = filename
 
         if error is not None:
             flash(error)
+            return render_template('track/update.html', post=post)
+        
         else:
             db = get_db().tracks.update_one(
                 {"_id": post["_id"]},
-                {"$set":{"title": title, "description": description}}
+                {"$set":{"title": title, "description": description, "file": new_file_name}}
             )
+            flash('Post updated successfully!')
             return redirect(url_for('track.index'))
 
     return render_template('track/update.html', post=post)
-
 
 @bp.route('/<string:id>/delete', methods=('POST',))
 @login_required

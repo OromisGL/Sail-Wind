@@ -59,8 +59,26 @@
             </header>
         {% endfor %}
 
-        <main class="container py5 text-center">          
-            {% block content %}{% endblock %}
+        <main class="d-flex">   
+            <!-- Linke Seitenleiste -->
+            <div class="bg-light sticky-top" style="width: 250px; height: calc(100vh - 60px); overflow-y: auto;">
+                <div class="p-3">
+                    <h5>Profil</h5>
+                    {% if g.user %}
+                        <p><strong>Username:</strong> {{ g.user['username'] }}</p>
+                        <div class="list-group">
+                            <a href="#" class="list-group-item list-group-item-action">Mein Profil</a>
+                            <a href="#" class="list-group-item list-group-item-action">Meine Freunde</a>
+                            <a href="#" class="list-group-item list-group-item-action">Einstellungen</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Hauptinhalt -->
+            <div class="flex-grow-1">
+                {% block content %}{% endblock %}
+            </div>
         </main>
         
     </body>

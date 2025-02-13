@@ -6,32 +6,36 @@
 {% endblock %}
 
 {% block content %}
-    {% for post in posts %}
+    {% for post in posts[::-1] %}
     <div class="post">
         <div class="container">
             <div class="row justify-content-md-center">
-                <div class="col">
-                    <h1>{{ post['title'] }}</h1>                
+                <div class="col-auto">
+                    <h1>{{ post['title'] }}</h1>
                 </div>
-                <div>
-                    <h5>{{ post['description'] }}</h5>
-                </div>
-                <div class="col">  
-                    <label>Posted by {{ post['created_by'] }} on {{ post['_id'].generation_time.strftime('%Y-%m-%d') }}</label>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        {% if post._id %}
-                            <div id="map">{{ maps[post._id]|safe }}</div>
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="col-auto mr-auto">
+                <div class="col-auto">
                     {% if g.user['id'] == post['author_id'] %}
                         <div class="col-sm">
-                            <a href="{{ url_for('track.update', id=post['_id']) }}" class="badge badge-light">Edit</a>
+                            <a href="{{ url_for('track.update', id=post['_id']) }}" class="badge bg-primary text-decoration-none">Edit</a>
                         </div>
-                    {% endif %}
+                    {% endif %}          
+                </div>
+                <div class="row justify-content-center w-100">
+                    <div class="overflow-auto" style="max-width: 200px">
+                        <h5>{{ post['description'] }}</h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="md-3">
+                        <div class="col">
+                            {% if post._id %}
+                                <div id="map">{{ maps[post._id]|safe }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col">  
+                    <label>Posted by <a href="{{ url_for('track.index') }}">{{ post['created_by'] }}</a> on {{ post['_id'].generation_time.strftime('%Y-%m-%d') }}</label>
                 </div>
             </div>
         </div>
