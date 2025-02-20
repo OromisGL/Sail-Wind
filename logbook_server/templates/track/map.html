@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+    Map
+{% endblock %}
+
+
+{% block content %}
+   
+    <div class="container-fluid vh-100 d-flex flex-column overflow-hidden p-0 m-0">
+        <div class="row flex-grow-1 overflow-hidden m-0 p-0">  <!-- overflow-hidden verhindert Scrollen -->
+            <div class="col-12 p-0 m-0">
+                <div id="map" class="w-100 h-100">{{ map_data|safe }}</div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
