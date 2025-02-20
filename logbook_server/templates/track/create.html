@@ -15,13 +15,13 @@
       <div class="mb-3">
         <textarea class="form-control mx-auto w-auto" name="description" placeholder="Description" id="description">{{ request.form['description'] }}</textarea>
       </div>
-      <div class="mb-3">
-        <label>Upload File</label>
+      <div class="mb-3 text-center">
+        <label class="">Upload [.gpx] File</label>
       </div>
       <div class="mb-3">
         <input class="form-control mx-auto w-auto" type="file" name="file" accept=".gpx" id="file" required>
       </div>
-        <div class="mb-3">
+      <div class="mb-3 d-flex justify-content-center">
         <button type="submit" class="btn btn-primary">Post</button>
       </div>
     </div>  

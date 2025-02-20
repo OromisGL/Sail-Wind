@@ -5,7 +5,7 @@
 
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
         <!-- Links for css an js for the Folium Map -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
@@ -25,20 +25,13 @@
 
     </head>
     <body>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <nav class="navbar navbar-expand-sm navbar-light bg-light mb-0">
             <div class="container-fluid">
-                <a class="navbar-brand" href="{{ url_for('track.index') }}">
+                <a class="navbar-brand" href="{{ url_for('track.map') }}">
                     Flaskr
                 </a>
                 <div class="collapse navbar-collapse" id="navbar">
                     {% if g.user %}
-                        <ul class="nav justify-content-center">    
-                            <li class="nav-item"><span>{{ g.user['username'] }}</span>
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('track.create') }}">New Post</a>
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('track.index') }}">Profile</a>
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('track.index') }}">Friends</a>
-                        </ul>
-
                         <ul class="navbar-nav ms-auto mt-2">
                             <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Log Out</a>
                             </ul>
@@ -59,27 +52,24 @@
             </header>
         {% endfor %}
 
-        <main class="d-flex">   
+        <main class="d-flex" style="height: calc(100vh - 65px)">   
             <!-- Linke Seitenleiste -->
-            <div class="bg-light sticky-top" style="width: 250px; height: calc(100vh - 60px); overflow-y: auto;">
+            <div class="bg-light sticky-top overflow-y-auto p-3" style="width: 250px;">
                 <div class="p-3">
-                    <h5>Profil</h5>
                     {% if g.user %}
-                        <p><strong>Username:</strong> {{ g.user['username'] }}</p>
                         <div class="list-group">
-                            <a href="#" class="list-group-item list-group-item-action">Mein Profil</a>
-                            <a href="#" class="list-group-item list-group-item-action">Meine Freunde</a>
-                            <a href="#" class="list-group-item list-group-item-action">Einstellungen</a>
+                            <a class="list-group-item list-group-item-action" href="{{ url_for('track.map') }}">Map</a>
+                            <a class="list-group-item list-group-item-action" href="{{ url_for('track.create') }}">New Post</a>
+                            <a class="list-group-item list-group-item-action" href="{{ url_for('track.index') }}">Timeline</a>
                         </div>
                     {% endif %}
                 </div>
             </div>
             
             <!-- Hauptinhalt -->
-            <div class="flex-grow-1">
+            <div class="flex-grow-1 overflow-hidden p-3 m-3 d-flex">
                 {% block content %}{% endblock %}
             </div>
         </main>
-        
     </body>
 </html>

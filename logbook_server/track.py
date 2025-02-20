@@ -8,7 +8,7 @@ from werkzeug.utils import secure_filename
 
 from logbook_server.auth import login_required
 from logbook_server.db import get_db
-from logbook_server.map_utils import build_map
+from logbook_server.map_utils import build_map, builld_default_map
 
 UPLOAD_FOLDER = 'uploads/'
 ALLOWED_EXTENSIONS = {'gpx'}
@@ -36,6 +36,23 @@ def index():
                 flash(f"File Not found: {file_path}")
     # print(the_map._repr_html_())
     return render_template('track/index.html',maps=maps, posts=posts)
+
+@bp.route('/map')
+@login_required
+def map():
+    
+    # default Werbellinsee
+    latitude = 52.924095
+    longitude = 13.713948
+    
+    if latitude and longitude:
+        map_data = builld_default_map(latitude, longitude)
+        return render_template('track/map.html', map_data=map_data._repr_html_())
+    
+    else:
+        
+        map_data = builld_default_map(latitude, longitude)
+        return render_template('track/map.html', map_data=map_data._repr_html_())
 
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required

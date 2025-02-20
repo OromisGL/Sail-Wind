@@ -8,3 +8,5 @@
 5. Export mongodb connection string ```set -x MONGO_URI mongodb://root:example@localhost:27017```
 6. Start flask ```flask --app logbook_server/ run --debug```
 
+docker pull ghcr.io/earthobservations/wetterdienst
+docker run -ti ghcr.io/earthobservations/wetterdienst

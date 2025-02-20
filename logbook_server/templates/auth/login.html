@@ -7,13 +7,17 @@
 
 
 {% block content %}
-<form action="{{ url_for('auth.login') }}" method="post">
-    <div class="mb-3">
-            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="username" id="username" placeholder="Username" type="text">
+    <form action="{{ url_for('auth.login') }}" method="post">
+        <div class="mb-3 d-flex flex-column justify-content-center align-items-center vh-100">
+            <div class="mb-3">
+                <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="username" id="username" placeholder="Username" type="text">
+            </div>
+            <div class="mb-3">
+                <input class="form-control mx-auto w-auto" name="password" placeholder="Password" type="password" id="password" required>
+            </div>
+            <div class="mb-3 d-flex justify-content-center">
+                <button class="btn btn-primary" type="submit">Log In</button>
+            </div>
         </div>
-        <div class="mb-3">
-            <input class="form-control mx-auto w-auto" name="password" placeholder="Password" type="password" id="password" required>
-        </div>
-        <button class="btn btn-primary" type="submit">Log In</button>
-</form>
+    </form>
 {% endblock %}

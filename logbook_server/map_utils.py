@@ -1,5 +1,7 @@
 from gpxplotter import read_gpx_file, create_folium_map, add_segment_to_map
 from gpxplotter.common import RELABEL
+from datetime import datetime
+import wetterdienst 
 import folium
 import branca.colormap as cm
 
@@ -28,3 +30,25 @@ def build_map(path):
 #for track in read_gpx_file('2022/2022-07-30_s_gelb_Steffen_elli.gpx'):
 #   print(track)
 #    print("end track")
+
+def builld_default_map(latitude, longitude):
+    the_map = create_folium_map(tiles='openstreetmap', max_bounds=True)
+    folium.Marker([latitude, longitude], icon=folium.Icon(color='red')).add_to
+    the_map.fit_bounds([[latitude - 0.05, longitude - 0.05],
+                        [latitude + 0.05, longitude + 0.05]])
+    return the_map
+
+
+
+# Create client object.
+dwd = DwdWeather(resolution="hourly")
+
+# Find closest station to position.
+closest = dwd.nearest_station(lon=7.0, lat=51.0)
+
+# The hour you're interested in.
+# The example is 2014-03-22 12:00 (UTC).
+query_hour = datetime(2014, 3, 22, 12)
+
+result = dwd.query(station_id=closest["station_id"], timestamp=query_hour)
+print(result)

@@ -1,0 +1,107 @@
+[
+  {
+    "name": "Werbellinsee",
+    "latitude": 52.8067,
+    "longitude": 13.6856,
+    "size_km2": 3.6,
+    "location": "Brandenburg"
+  },
+  {
+    "name": "Schluchsee",
+    "latitude": 47.8322,
+    "longitude": 8.1439,
+    "size_km2": 3.7,
+    "location": "Baden-Württemberg"
+  },
+  {
+    "name": "Starnberger See",
+    "latitude": 47.9294,
+    "longitude": 11.3083,
+    "size_km2": 56.4,
+    "location": "Bayern"
+  },
+  {
+    "name": "Bodensee",
+    "latitude": 47.6500,
+    "longitude": 9.1833,
+    "size_km2": 536,
+    "location": "Bayern, Baden-Württemberg, Schweiz"
+  },
+  {
+    "name": "Müritz",
+    "latitude": 53.3650,
+    "longitude": 12.7397,
+    "size_km2": 117,
+    "location": "Mecklenburg-Vorpommern"
+  },
+  {
+    "name": "Chiemsee",
+    "latitude": 47.8833,
+    "longitude": 12.5806,
+    "size_km2": 79.9,
+    "location": "Bayern"
+  },
+  {
+    "name": "Tegernsee",
+    "latitude": 47.7256,
+    "longitude": 11.7181,
+    "size_km2": 4.2,
+    "location": "Bayern"
+  },
+  {
+    "name": "Plöner See",
+    "latitude": 54.1314,
+    "longitude": 10.4167,
+    "size_km2": 28.7,
+    "location": "Schleswig-Holstein"
+  },
+  {
+    "name": "Königssee",
+    "latitude": 47.6111,
+    "longitude": 12.9981,
+    "size_km2": 5.2,
+    "location": "Bayern"
+  },
+  {
+    "name": "Siegener See",
+    "latitude": 50.9039,
+    "longitude": 8.0500,
+    "size_km2": 4.6,
+    "location": "Nordrhein-Westfalen"
+  },
+  {
+    "name": "Großer Plöner See",
+    "latitude": 54.1314,
+    "longitude": 10.4167,
+    "size_km2": 28.7,
+    "location": "Schleswig-Holstein"
+  },
+  {
+    "name": "Schweriner See",
+    "latitude": 53.6294,
+    "longitude": 11.4319,
+    "size_km2": 61.5,
+    "location": "Mecklenburg-Vorpommern"
+  },
+  {
+    "name": "Oder-Spree-See",
+    "latitude": 52.4589,
+    "longitude": 14.0147,
+    "size_km2": 7.7,
+    "location": "Brandenburg"
+  },
+  {
+    "name": "Hennesee",
+    "latitude": 51.3242,
+    "longitude": 8.2433,
+    "size_km2": 4.5,
+    "location": "Nordrhein-Westfalen"
+  },
+  {
+    "name": "Krummer Wels",
+    "latitude": 53.4542,
+    "longitude": 12.9067,
+    "size_km2": 5.0,
+    "location": "Mecklenburg-Vorpommern"
+  }
+]
