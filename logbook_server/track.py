@@ -8,9 +8,12 @@ from werkzeug.utils import secure_filename
 
 from logbook_server.auth import login_required
 from logbook_server.db import get_db
-from logbook_server.map_utils import build_map, builld_default_map
+from logbook_server.map_utils import build_map, builld_default_map, station_request, wind_velo, wind_direct, wind_compass, beafort, encode_image
+import threading
+import time
 
-UPLOAD_FOLDER = 'uploads/'
+img_path = '/Users/glaeder/fahrtenbuch-server/assets/blue-arrow-png.png'
+UPLOAD_FOLDER = 'logbook_server/uploads/'
 ALLOWED_EXTENSIONS = {'gpx'}
 
 bp = Blueprint('track', __name__, url_prefix='/track')
@@ -37,6 +40,31 @@ def index():
     # print(the_map._repr_html_())
     return render_template('track/index.html',maps=maps, posts=posts)
 
+velocity = 0
+direction = 0
+compass = 'N'
+beaufort = 0
+
+def update_weather_data(lat, lon):
+    global velocity
+    global direction
+    global compass
+    global beaufort
+    while True:
+            try:
+                station = station_request(lat, lon)
+                velocity = wind_velo(station)
+                direction  = wind_direct(station) # in Grad (0 = Norden, 90 = Osten, 180 = Süden, 270 = Westen)
+                compass = wind_compass(direction)
+                beaufort = beafort(velocity)
+                print(velocity)
+                print(direction)
+            except Exception as e:
+                flash(f'Keine Wetterdaten: {e}')
+            time.sleep(200)
+            
+threading.Thread(target=update_weather_data, args=(52.924095, 13.713948), daemon=True).start()
+
 @bp.route('/map')
 @login_required
 def map():
@@ -46,13 +74,12 @@ def map():
     longitude = 13.713948
     
     if latitude and longitude:
-        map_data = builld_default_map(latitude, longitude)
-        return render_template('track/map.html', map_data=map_data._repr_html_())
-    
-    else:
+        wind_arrow = encode_image(img_path)
         
         map_data = builld_default_map(latitude, longitude)
-        return render_template('track/map.html', map_data=map_data._repr_html_())
+        
+        return render_template('track/map.html', map_data=map_data._repr_html_(), wind_speed=velocity, wind_direction=direction, compass_direction=compass, getBeauforScale=beaufort, wind_arrow=wind_arrow)
+    return render_template('track/map.html')
 
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required
