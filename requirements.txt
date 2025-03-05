@@ -1,0 +1,11 @@
+click==8.1.8
+config-py==0.1.1
+flask
+requests
+pandas
+numpy
+wetterdienst
+gpxplotter
+bson
+pymongo
+polars
