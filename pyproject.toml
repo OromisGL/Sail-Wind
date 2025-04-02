@@ -1,0 +1,22 @@
+[project]
+name = "logbook_server"
+version = "0.1.0"
+description = "A tool to collect and analyse gpx traces."
+dependencies = [
+    "flask",
+    "pymongo>=4.3.2",
+    "gpxplotter"
+]
+
+[build-system]
+requires = ["flit_core<4"]
+    
+build-backend = "flit_core.buildapi"
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "coverage",
+    "pytest-mongodb"
+]
+

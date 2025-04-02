@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+
+{% block title %}
+  New Post
+{% endblock %}
+
+
+{% block content %}
+  <form method="post" enctype="multipart/form-data">
+    <div class="form-control mx-auto w-auto">
+      <div class="mb-3">
+        <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="title" id="title" placeholder="Title" value="{{ request.form['title'] }}" required>
+      </div>
+      <div class="mb-3">
+        <textarea class="form-control mx-auto w-auto" name="description" placeholder="Description" id="description">{{ request.form['description'] }}</textarea>
+      </div>
+      <div class="mb-3 text-center">
+        <label class="">Upload [.gpx] File</label>
+      </div>
+      <div class="mb-3">
+        <input class="form-control mx-auto w-auto" type="file" name="file" accept=".gpx" id="file" required>
+      </div>
+      <div class="mb-3 d-flex justify-content-center">
+        <button type="submit" class="btn btn-primary">Post</button>
+      </div>
+    </div>  
+  </form>
+{% endblock %}
