@@ -1,17 +1,2 @@
-venv/
-*.pyc
-__pycache__/
-instance/
-.pytest_cache
-.coverage
-htmlcov/
-dist/
-build/
-*.egg-info/
-.idea
-bin
-lib
-lib64
-pyvenv.cfg
-*.gpx
-share
+# Created by venv; see https://docs.python.org/3/library/venv.html
+*

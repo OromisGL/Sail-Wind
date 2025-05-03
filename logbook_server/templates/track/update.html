@@ -6,7 +6,7 @@
 
 {% block content %}
 <form method="post" enctype="multipart/form-data">
-  <div class="form-control mx-auto w-auto">
+  <div class="mb-3 d-flex flex-column justify-content align-items-center">
     <div class="mb-3">
       <input class="form-control mx-auto w-auto" name="title" id="title"
             value="{{ request.form['title'] or post['title'] }}" required>
@@ -15,23 +15,28 @@
       <textarea class="form-control mx-auto w-auto" name="description" id="description">{{ request.form['description'] or post['description'] }}</textarea>
     </div>
     <div class="mb-3">
-      <small id="file-name">
-        Current File: 
-        <br>
-        {{ post['file'] }}
-      </small>
+      <div class="form-control mx-auto w-auto">
+        <small  id="file-name">
+          Current File: 
+          <br>
+          {{ post['file'] }}
+        </small>
+    </div>
       <input class="form-control mx-auto w-auto" type="file" name="file" id="file">
     </div>
     <div class="mb-3">
       <button type="submit" class="btn btn-secondary">Save</button>
     </div>
   </div>
-</form>
-<form action="{{ url_for('track.delete', id=post['_id']) }}" method="post">
-  <div class="mx-auto w-auto">
-    <div class="mb-3">
-      <button class="btn btn-primary" type="submit" onclick="return confirm('You want to delete the Post?');">Delete</button>
-    </div>
+  <div class="mb-3">
+    <form action="{{ url_for('track.delete', id=post['_id']) }}" method="post">
+      <div class="mb-3 d-flex flex-column justify-content align-items-center">
+        <div class="mb-3">
+          <button class="btn btn-primary" type="submit" onclick="return confirm('You want to delete the Post?');">Delete</button>
+        </div>
+      </div>
+    </form>
   </div>
 </form>
+
 {% endblock %}

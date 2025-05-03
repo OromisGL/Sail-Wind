@@ -50,7 +50,6 @@ def station_request(lat, lon):
     parameters=("10_minutes", "wind"),
     settings=settings
     ).filter_by_distance(latlon=location, distance=30) # Station request with in a radius of 30 km
-    
     df = station.df.head()
     station = df[0]
     station_id = station.select("station_id").item() # Station Id for next request, can not access the data in on request 

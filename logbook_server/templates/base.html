@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="de">
 
-    <title>{% block title %}{% endblock %} - Flaskr</title>
+    <title>{% block title %}{% endblock %} - Sail</title>
 
     <head>
         <meta charset="UTF-8">
@@ -20,7 +20,6 @@
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
-
         <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
     </head>
@@ -28,7 +27,7 @@
         <nav class="navbar navbar-expand-sm navbar-light bg-light mb-0">
             <div class="container-fluid">
                 <a class="navbar-brand" href="{{ url_for('track.map') }}">
-                    Flaskr
+                    Sail-Wind
                 </a>
                 <div class="collapse navbar-collapse" id="navbar">
                     {% if g.user %}
@@ -46,7 +45,7 @@
         </nav>
         {% for message in get_flashed_messages() %}
             <header>
-                <div class="alert alert-primary mb-0 text-center" role="alert"">
+                <div class="alert alert-primary mb-0 text-center" role="alert">
                     {{ message }}
                 </div>
             </header>
@@ -65,7 +64,7 @@
                     {% endif %}
                 </div>
             </div>
-            
+
             <!-- Hauptinhalt -->
             <div class="flex-grow-1 overflow-auto p-3 m-3 d-flex flex-column">
                 {% block content %}{% endblock %}

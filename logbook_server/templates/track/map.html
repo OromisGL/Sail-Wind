@@ -12,12 +12,13 @@
         <div class="row flex-grow-1 overflow-hidden m-0 p-0">  <!-- overflow-hidden verhindert Scrollen -->
             <div class="col-12 p-0 m-0">
                 <div id="map" class="w-100 h-100 position-relative"> {{ map_data|safe }}
-                    <div id="wind-info" style="position: absolute; bottom: 75px; left: 10px; z-index: 9999; font-size: 14px; background: rgba(255, 255, 255, 0.7); padding: 10px; border-radius: 10px; display: none;">
-                        <p><b>Winddaten</b></p>
-                        <p id="wind-speed">Geschwindigkeit: {{ wind_speed }} m/s</p>
-                        <p id="wind-strength">Windstärke: {{ beaufort }}</p>
-                        <p id="wind-direction">Richtung: {{ compass_direction }}</p>
-                        <img id="wind-arrow" src="data:image/png;base64,{{ wind_arrow }}" style="position: absolute; width: 50px; left: 120px; top: 100px;">
+                    <div id="wind-info" style="position: absolute; width: 180px; bottom: 75px; left: 10px; z-index: 9999; font-size: 14px; background: rgba(255, 255, 255, 0.7); padding: 10px; border-radius: 10px; display: none;">
+                        <p><b>Wind Data</b></p>
+                        <p id="wind-speed">Velocity: {{ wind_speed }} m/s</p>
+                        <p id="wind-strength">Wind Strength: {{ beaufort }}</p>
+                        <p id="wind-direction">Direction: {{ compass_direction }}</p>
+                        <img id="wind-arrow" src="data:image/png;base64,{{ wind_arrow }}" style="position: absolute; width: 50px; left: 125px; top: 100px;">
+                        <img id="DWD-Logo" src="data:image/png;base64,{{ DWD_logo }}" style="position: relative; height: 25px; left: 100px; top: 75px;">
                     </div>
                 </div>
             </div>
@@ -28,15 +29,15 @@
         // Initiale Winddaten von Flask erhalten
         const initialWindSpeed = {{ wind_speed }};
         const initialWindDirection = {{ wind_direction }};
-        const initialCompassDirection = "{{ compass_direction }}";
+        const initialCompassDirection = {{ compass_direction }};
         const initialBeaufort = {{ getBeauforScale }};
     
         // Funktion, um die Karte mit den Winddaten zu aktualisieren
         function updateMapWithWindData(windSpeed, windDirection, compassDirection, beaufort) {
             // Winddaten HTML aktualisieren
-            document.getElementById('wind-speed').textContent = `Geschwindigkeit: ${windSpeed} m/s`;
-            document.getElementById('wind-strength').textContent = `Windstärke: ${beaufort}`;
-            document.getElementById('wind-direction').textContent = `Richtung: ${compassDirection}°`;
+            document.getElementById('wind-speed').textContent = `Velocity: ${windSpeed} m/s`;
+            document.getElementById('wind-strength').textContent = `Wind Strength: ${beaufort}`;
+            document.getElementById('wind-direction').textContent = `Direction: ${compassDirection}`;
 
             // Update der Windpfeil-Drehung (Rotation des Bildes)
             document.getElementById('wind-arrow').style.transform = `rotate(${windDirection}deg)`;
@@ -47,6 +48,7 @@
 
         // Funktion zum Abrufen der Winddaten alle 10 Sekunden
         function fetchWindData() {
+
             // Hier rufen wir einfach die bereits im Template übergebenen Daten erneut ab
             updateMapWithWindData(initialWindSpeed, initialWindDirection, initialCompassDirection, initialBeaufort);
         }
@@ -55,6 +57,6 @@
         fetchWindData();
 
         // Alle 10 Sekunden die Winddaten erneut aktualisieren
-        setInterval(fetchWindData, 200);
+        setInterval(fetchWindData, 1000);
     </script>
 {% endblock %}

@@ -11,7 +11,7 @@ services:
     restart: 'always'
     networks:
       - 'zitadel'
-    image: 'ghcr.io/zitadel/zitadel:latest'
+    image: 'ghcr.io/zitadel/zitadel:v2.44.0'
     command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters" --tlsMode disabled'
     environment:
       - 'ZITADEL_DATABASE_COCKROACH_HOST=crdb'
@@ -26,7 +26,7 @@ services:
     restart: 'always'
     networks:
       - 'zitadel'
-    image: 'cockroachdb/cockroach:v22.2.2'
+    image: 'cockroachdb/cockroach:v22.1.11'
     command: 'start-single-node --insecure'
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]
@@ -37,6 +37,7 @@ services:
     ports:
       - '9090:8080'
       - '26257:26257'
+  
 
 networks:
   zitadel:

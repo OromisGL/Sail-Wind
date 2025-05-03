@@ -12,7 +12,8 @@ from logbook_server.map_utils import build_map, builld_default_map, station_requ
 import threading
 import time
 
-img_path = '/Users/glaeder/fahrtenbuch-server/assets/blue-arrow-png.png'
+img_path_arrow = './assets/blue-arrow-png.png'
+DWD_img = './assets/dwd-logo-png.png'
 UPLOAD_FOLDER = 'logbook_server/uploads/'
 ALLOWED_EXTENSIONS = {'gpx'}
 
@@ -51,19 +52,29 @@ def update_weather_data(lat, lon):
     global compass
     global beaufort
     while True:
-            try:
-                station = station_request(lat, lon)
-                velocity = wind_velo(station)
-                direction  = wind_direct(station) # in Grad (0 = Norden, 90 = Osten, 180 = Süden, 270 = Westen)
-                compass = wind_compass(direction)
-                beaufort = beafort(velocity)
-                print(velocity)
-                print(direction)
-            except Exception as e:
-                flash(f'Keine Wetterdaten: {e}')
-            time.sleep(200)
-            
-threading.Thread(target=update_weather_data, args=(52.924095, 13.713948), daemon=True).start()
+        try:
+            station = station_request(lat, lon)
+            velocity = wind_velo(station)
+            direction  = wind_direct(station) # in Grad (0 = Norden, 90 = Osten, 180 = Süden, 270 = Westen)
+            compass = wind_compass(direction)
+            beaufort = beafort(velocity)
+            print(velocity)
+            print(direction)
+            if (velocity and direction):
+                wind_speed = velocity
+                wind_direction = direction
+                compass_direction = compass
+                getBeauforScale = beaufort
+            else:
+                flash(f"Keine Daten von Station {station}")
+                
+        except Exception as e:
+            flash(f'Keine Wetterdaten: {e}')
+        time.sleep(200)
+        
+        return wind_speed, wind_direction, compass_direction, getBeauforScale
+
+# threading.Thread(target=update_weather_data, args=(52.924095, 13.713948), daemon=True).start()
 
 @bp.route('/map')
 @login_required
@@ -74,11 +85,12 @@ def map():
     longitude = 13.713948
     
     if latitude and longitude:
-        wind_arrow = encode_image(img_path)
+        wind_arrow = encode_image(img_path_arrow)
+        DWD_logo = encode_image(DWD_img)
         
         map_data = builld_default_map(latitude, longitude)
         
-        return render_template('track/map.html', map_data=map_data._repr_html_(), wind_speed=velocity, wind_direction=direction, compass_direction=compass, getBeauforScale=beaufort, wind_arrow=wind_arrow)
+        return render_template('track/map.html', map_data=map_data._repr_html_(), wind_speed=velocity, wind_direction=direction, compass_direction=compass, getBeauforScale=beaufort, wind_arrow=wind_arrow, DWD_logo=DWD_logo)
     return render_template('track/map.html')
 
 @bp.route('/create', methods=('GET', 'POST'))
