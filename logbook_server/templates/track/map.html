@@ -29,18 +29,18 @@
         // Initiale Winddaten von Flask erhalten
         const initialWindSpeed = {{ wind_speed }};
         const initialWindDirection = {{ wind_direction }};
-        const initialCompassDirection = {{ compass_direction }};
+        const initialCompassDirection = {{ direction }};
         const initialBeaufort = {{ getBeauforScale }};
     
         // Funktion, um die Karte mit den Winddaten zu aktualisieren
-        function updateMapWithWindData(windSpeed, windDirection, compassDirection, beaufort) {
+        function updateMapWithWindData(wind_Speed, wind_direction, direction, getBeauforScale) {
             // Winddaten HTML aktualisieren
-            document.getElementById('wind-speed').textContent = `Velocity: ${windSpeed} m/s`;
-            document.getElementById('wind-strength').textContent = `Wind Strength: ${beaufort}`;
-            document.getElementById('wind-direction').textContent = `Direction: ${compassDirection}`;
+            document.getElementById('wind-speed').textContent = `Velocity: ${wind_Speed} m/s`;
+            document.getElementById('wind-strength').textContent = `Wind Strength: ${getBeauforScale}`;
+            /*document.getElementById('wind-direction').textContent = `Direction: ${direction}`;*/
 
             // Update der Windpfeil-Drehung (Rotation des Bildes)
-            document.getElementById('wind-arrow').style.transform = `rotate(${windDirection}deg)`;
+            document.getElementById('wind-arrow').style.transform = `rotate(${direction}deg)`;
 
             // Die Anzeige der Winddaten sichtbar machen
             document.getElementById('wind-info').style.display = 'block';

@@ -8,6 +8,9 @@ import folium
 from folium.plugins import FloatImage
 import base64
 import branca.colormap as cm
+import time
+import threading
+from flask import flash
 
 
 settings = Settings(
@@ -41,6 +44,42 @@ def build_map(path):
 #for track in read_gpx_file('2022/2022-07-30_s_gelb_Steffen_elli.gpx'):
 #   print(track)
 #    print("end track")
+
+velocity = 0
+direction = 0
+compass = 'N'
+beaufort = 0
+
+def update_weather_data(lat, lon):
+    global velocity
+    global direction
+    global compass
+    global beaufort
+    while True:
+        try:
+            station = station_request(lat, lon)
+            velocity = wind_velo(station)
+            direction  = wind_direct(station) # in Grad (0 = Norden, 90 = Osten, 180 = Süden, 270 = Westen)
+            compass = wind_compass(direction)
+            print(type(compass))
+            beaufort = beafort(velocity)
+            
+            if (velocity and direction):
+                wind_speed = velocity
+                wind_direction = direction
+                compass_direction = compass
+                print(compass_direction)
+                getBeauforScale = beaufort
+            else:
+                flash(f"Keine Daten von Station {station}")
+                
+        except Exception as e:
+            flash(f'Keine Wetterdaten: {e}')
+        # time.sleep(200)
+        
+        return wind_speed, wind_direction, compass_direction, getBeauforScale, direction
+
+# threading.Thread(target=update_weather_data, args=(52.924095, 13.713948), daemon=True).start()
 
 def station_request(lat, lon):
     
