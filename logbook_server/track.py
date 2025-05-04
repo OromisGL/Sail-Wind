@@ -11,6 +11,7 @@ from logbook_server.db import get_db
 from logbook_server.map_utils import *
 import threading
 import time
+import jsonify
 
 img_path_arrow = './assets/blue-arrow-png.png'
 DWD_img = './assets/dwd-logo-png.png'
@@ -42,6 +43,16 @@ def index():
     return render_template('track/index.html',maps=maps, posts=posts)
 
 
+@bp.route('/api/wind') # creating a 
+def get_wind_data():
+    return jsonify({
+        'wind_speed': velocity,
+        'wind_direction': direction,
+        'compass_direction': compass,
+        'beaufort': beaufort
+    })
+
+
 @bp.route('/map')
 @login_required
 def map():
@@ -68,6 +79,7 @@ def map():
             wind_arrow=wind_arrow, 
             DWD_logo=DWD_logo)
     return render_template('track/map.html')
+
 
 @bp.route('/create', methods=('GET', 'POST'))
 @login_required

@@ -8,14 +8,14 @@
 
 {% block content %}
 
-    <div class="container-fluid vh-100 d-flex flex-column overflow-hidden p-0 m-0">
+    <div class="container-fluid vh-100 d-flex flex-column p-0 m-0">
         <div class="row flex-grow-1 overflow-hidden m-0 p-0">  <!-- overflow-hidden verhindert Scrollen -->
             <div class="col-12 p-0 m-0">
                 <div id="map" class="w-100 h-100 position-relative"> {{ map_data|safe }}
                     <div id="wind-info" style="position: absolute; width: 180px; bottom: 75px; left: 10px; z-index: 9999; font-size: 14px; background: rgba(255, 255, 255, 0.7); padding: 10px; border-radius: 10px; display: none;">
                         <p><b>Wind Data</b></p>
                         <p id="wind-speed">Velocity: {{ wind_speed }} m/s</p>
-                        <p id="wind-strength">Wind Strength: {{ beaufort }}</p>
+                        <p id="wind-strength">Wind Strength: {{ getBeauforScale }}</p>
                         <p id="wind-direction">Direction: {{ compass_direction }}</p>
                         <img id="wind-arrow" src="data:image/png;base64,{{ wind_arrow }}" style="position: absolute; width: 50px; left: 125px; top: 100px;">
                         <img id="DWD-Logo" src="data:image/png;base64,{{ DWD_logo }}" style="position: relative; height: 25px; left: 100px; top: 75px;">
@@ -28,12 +28,11 @@
     <script>
         // Initiale Winddaten von Flask erhalten
         const initialWindSpeed = {{ wind_speed }};
-        const initialWindDirection = {{ wind_direction }};
         const initialCompassDirection = {{ direction }};
         const initialBeaufort = {{ getBeauforScale }};
     
         // Funktion, um die Karte mit den Winddaten zu aktualisieren
-        function updateMapWithWindData(wind_Speed, wind_direction, direction, getBeauforScale) {
+        function updateMapWithWindData(wind_Speed, direction, getBeauforScale) {
             // Winddaten HTML aktualisieren
             document.getElementById('wind-speed').textContent = `Velocity: ${wind_Speed} m/s`;
             document.getElementById('wind-strength').textContent = `Wind Strength: ${getBeauforScale}`;
@@ -50,7 +49,7 @@
         function fetchWindData() {
 
             // Hier rufen wir einfach die bereits im Template übergebenen Daten erneut ab
-            updateMapWithWindData(initialWindSpeed, initialWindDirection, initialCompassDirection, initialBeaufort);
+            updateMapWithWindData(initialWindSpeed, initialCompassDirection, initialBeaufort);
         }
 
         // Initiale Winddaten sofort laden
@@ -58,5 +57,6 @@
 
         // Alle 10 Sekunden die Winddaten erneut aktualisieren
         setInterval(fetchWindData, 1000);
+        console.log(initialWindSpeed, initialCompassDirection, initialBeaufort)
     </script>
 {% endblock %}

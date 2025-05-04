@@ -51,10 +51,7 @@ compass = 'N'
 beaufort = 0
 
 def update_weather_data(lat, lon):
-    global velocity
-    global direction
-    global compass
-    global beaufort
+    global velocity, direction, compass, beaufort
     while True:
         try:
             station = station_request(lat, lon)
@@ -75,11 +72,11 @@ def update_weather_data(lat, lon):
                 
         except Exception as e:
             flash(f'Keine Wetterdaten: {e}')
-        # time.sleep(200)
+        time.sleep(200)
         
         return wind_speed, wind_direction, compass_direction, getBeauforScale, direction
 
-# threading.Thread(target=update_weather_data, args=(52.924095, 13.713948), daemon=True).start()
+threading.Thread(target=update_weather_data, args=(52.924095, 13.713948), daemon=True).start()
 
 def station_request(lat, lon):
     

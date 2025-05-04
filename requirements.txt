@@ -9,3 +9,4 @@ gpxplotter
 bson
 pymongo
 polars
+jsonify
