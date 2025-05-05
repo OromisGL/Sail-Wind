@@ -7,51 +7,94 @@
 
 
 {% block content %}
+{% block extra_style %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+{% endblock %}
 
-    <div class="container-fluid vh-100 d-flex flex-column p-0 m-0">
-        <div class="row flex-grow-1 overflow-hidden m-0 p-0">  <!-- overflow-hidden verhindert Scrollen -->
-            <div class="col-12 p-0 m-0">
-                <div id="map" class="w-100 h-100 position-relative"> 
-                    {{ map_data|safe }}
-                    <div id="wind-info" style="position: absolute; width: 180px; bottom: 75px; left: 10px; z-index: 9999; font-size: 14px; background: rgba(255, 255, 255, 0.7); padding: 10px; border-radius: 10px;">
-                        <p><b>Wind Data</b></p>
-                        <p id="wind-speed">Velocity: {{ wind_speed }} m/s</p>
-                        <p id="wind-strength">Wind Strength: {{ getBeauforScale }}</p>
-                        <p id="wind-direction">Direction: {{ compass_direction }}</p>
-                        <img id="wind-arrow" src="data:image/png;base64,{{ wind_arrow }}" style="position: absolute; width: 50px; left: 125px; top: 100px;">
-                        <img id="DWD-Logo" src="data:image/png;base64,{{ DWD_logo }}" style="position: relative; height: 25px; left: 100px; top: 75px;">
-                    </div>
-                </div>
-            </div>
+    <script>
+        let mapInstance, windMarker;
+    
+        // 1) Laufmap initialisieren
+        function initMap(lat, lon) {
+        mapInstance = L.map('map').setView([lat, lon], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(mapInstance);
+        windMarker = L.marker([lat, lon]).addTo(mapInstance);
+        }
+    
+        // 2) Globale Funktion für Button-Klicks
+        window.loadWindData = function(locationName) {
+        console.log("loadWindData called with:", locationName);
+    
+        fetch(`/track/api/wind_by_location?location=${encodeURIComponent(locationName)}`)
+            .then(response => {
+            if (!response.ok) {
+                throw new Error(`Network response was not ok (${response.status})`);
+            }
+            return response.json();
+            })
+            .then(data => {
+            // Karte animiert verlagern
+            mapInstance.flyTo([data.lat, data.lon], 13, {
+                animate: true,
+                duration: 3
+            });
+    
+            // Marker versetzen
+            windMarker.setLatLng([data.lat, data.lon]);
+    
+            // Wind-Overlay updaten
+            document.getElementById('wind-speed')
+                    .textContent    = `Velocity: ${data.wind_speed} m/s`;
+            document.getElementById('wind-strength')
+                    .textContent    = `Wind Strength: ${data.beaufort}`;
+            document.getElementById('wind-direction')
+                    .textContent    = `Direction: ${data.compass_direction}`;
+    
+            const arrow = document.getElementById('wind-arrow');
+            arrow.src    = `data:image/png;base64,${data.wind_arrow}`;
+            arrow.style.transform = `rotate(${data.wind_direction}deg)`;
+    
+            document.getElementById('wind-info').style.display = 'block';
+            })
+            .catch(err => console.error("Error loading wind data:", err));
+        };
+    
+        // 3) Buttons mit data-lake hooken und Map initialisieren
+        document.addEventListener("DOMContentLoaded", () => {
+        // Default-Koordinaten aus Flask (werden via render_template eingesetzt)
+        const defaultLat = {{ LATITUDE }};
+        const defaultLon = {{ LONGITUDE }};
+        initMap(defaultLat, defaultLon);
+    
+        // Alle Sidebar-Buttons, die data-lake tragen, an click binden
+        document.querySelectorAll(".lake-button").forEach(btn => {
+            btn.addEventListener("click", () => {
+            const lakeName = btn.dataset.lake;
+            loadWindData(lakeName);
+            });
+        });
+    
+        // Optional: direkt den ersten See laden
+        {% if initial_location_name %}
+        loadWindData({{ initial_location_name|tojson }});
+        {% endif %}
+        });
+    </script>
+
+    <div id="map">
+
+        <div id="wind-info">
+            <p><b>Wind Data</b></p>
+            <p id="wind-speed">Velocity: {{ wind_speed }} m/s</p>
+            <p id="wind-strength">Wind Strength: {{ getBeauforScale }}</p>
+            <p id="wind-direction">Direction: {{ compass_direction }}</p>
+
+            <img id="wind-arrow" src="data:image/png;base64,{{ wind_arrow }}" style="transform: rotate({{ wind_direction }}deg);">
+            <img id="DWD-Logo" src="data:image/png;base64,{{ DWD_logo }}">
         </div>
     </div>
 
-    <script>
-        function fetchWindData() {
-            fetch(`/track/api/wind?lat=52.924095&lon=13.713948`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error("Network response was not ok");
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    updateMapWithWindData(
-                        data.wind_speed,
-                        data.wind_direction,
-                        data.compass_direction,
-                        data.beaufort
-                    );
-                })
-                .catch(error => console.error('Error fetching wind data:', error));
-        }
-        function updateMapWithWindData(wind_speed, wind_direction, compass_direction, beaufort) {
-            document.getElementById('wind-speed').textContent = `Velocity: ${wind_speed} m/s`;
-            document.getElementById('wind-strength').textContent = `Wind Strength: ${beaufort}`;
-            document.getElementById('wind-direction').textContent = `Direction: ${compass_direction}`;
-            document.getElementById('wind-arrow').style.transform = `rotate(${wind_direction}deg)`;
-            document.getElementById('wind-info').style.display = 'block';
-        }
-        setInterval(fetchWindData, 10000);
-    </script>
 {% endblock %}

@@ -27,10 +27,10 @@ def create_app(test_config=None):
     except OSError:
         pass
 
-    # a simple page that says hello
-    @app.route('/hello')
-    def hello():
-        return 'Hello, World!'
+    # # a simple page that says hello
+    # @app.route('/hello')
+    # def hello():
+    #     return 'Hello, World!'
 
     from . import db
     db.init_app(app)
@@ -42,9 +42,13 @@ def create_app(test_config=None):
     app.register_blueprint(track.bp)
     app.add_url_rule('/', endpoint='track.map')
     
-        # make the register for the Data Fetch here
+    # make the register for the Data Fetch here
     from .map_utils import map_utils_bp, weather_updater
     app.register_blueprint(map_utils_bp, url_prefix='/track')
+    
+    # make a injection for the frontend to loop over the lake Data
+    from .map_utils import get_lake_data
+    get_lake_data(app)
     
     threading.Thread(target=weather_updater, daemon=True).start()
     

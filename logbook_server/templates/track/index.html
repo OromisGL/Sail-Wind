@@ -6,7 +6,9 @@
 {% endblock %}
 
 {% block content %}
+    
     {% for post in posts[::-1] %}
+
     <div class="post">
         <div class="container">
             <div class="row justify-content-md-center">
@@ -28,9 +30,11 @@
                 <div class="row">
                     <div class="md-3">
                         <div class="col">
-                            {% if post._id %}
-                                <div id="map">{{ maps[post._id]|safe }}</div>
-                            {% endif %}
+                            <div class="map-post">
+                                {% if post._id %}
+                                    <div id="post-map">{{ maps[post._id]|safe }}</div>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>

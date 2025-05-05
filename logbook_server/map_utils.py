@@ -1,3 +1,4 @@
+import os
 from gpxplotter import read_gpx_file, create_folium_map, add_segment_to_map
 from gpxplotter.common import RELABEL
 from datetime import datetime  
@@ -10,19 +11,26 @@ import base64
 import branca.colormap as cm
 import time
 import threading
-from flask import flash, Blueprint, request, jsonify
+from flask import flash, Blueprint, request, jsonify, json
 import zlib
 
+# default Werbellinsee
+LATITUDE = 52.924095
+LONGITUDE = 13.713948
 
-weather_data = {
+WEATHER_DATA = {
     "wind_speed": None,
     "wind_direction": None,
     "compass_direction": None,
-    "beaufort": None
+    "beaufort": None,
+    "lat": LATITUDE,
+    "lon": LONGITUDE
 }
-# default Werbellinsee
-latitude = 52.924095
-longitude = 13.713948
+
+
+THIS_DIR = os.path.dirname(__file__)
+PROJECT_ROOT = os.path.abspath(os.path.join(THIS_DIR, os.pardir))
+LAKE_FILE = os.path.join(PROJECT_ROOT, "assets", "lake_set.json")
 
 map_utils_bp = Blueprint('map_utils', __name__)
 
@@ -167,14 +175,23 @@ def wind_compass(wind_direction):
         return 'N/NW'
     
 
-def builld_default_map(latitude, longitude):
+def builld_default_map(LATITUDE, LONGITUDE):
     the_map = create_folium_map(tiles='openstreetmap', max_bounds=True)
-    folium.Marker([latitude, longitude], icon=folium.Icon(color='red')).add_to
-    the_map.fit_bounds([[latitude - 0.035, longitude - 0.035],
-                        [latitude + 0.035, longitude + 0.035]])
+    folium.Marker([LATITUDE, LONGITUDE], icon=folium.Icon(color='red')).add_to
+    the_map.fit_bounds([[LATITUDE - 0.035, LONGITUDE - 0.035],
+                        [LATITUDE + 0.035, LONGITUDE + 0.035]])
     return the_map
 
-def update_weather_data(lat, lon):
+def lat_lon(lake_name):
+    lakes = get_json(LAKE_FILE)
+    for lake in lakes:
+        if lake["name"] == lake_name:
+            return lake["latitude"], lake["longitude"]
+        
+    raise ValueError(f"Lake {lake_name} not found.")
+
+def update_WEATHER_DATA(lat, lon):
+    global WEATHER_DATA 
     try:
         station = station_request(lat, lon)
         velocity = wind_velo(station)
@@ -183,11 +200,13 @@ def update_weather_data(lat, lon):
         beaufort = beafort(velocity)
 
         # in globalen Cache schreiben
-        weather_data.update({
+        WEATHER_DATA.update({
             "wind_speed": velocity,
             "wind_direction": direction,
             "compass_direction": compass,
-            "beaufort": beaufort
+            "beaufort": beaufort,
+            "lat": lat,
+            "lon": lon
         })
 
     except zlib.error as e:
@@ -198,9 +217,33 @@ def update_weather_data(lat, lon):
 
 def weather_updater():
     while True:
-        update_weather_data(52.924095, 13.713948)
+        update_WEATHER_DATA(WEATHER_DATA["lat"], WEATHER_DATA["lon"])
         time.sleep(300)  # alle 5 Minuten
 
 @map_utils_bp.route('/api/wind')
 def get_wind_data():
-    return jsonify(weather_data)
+    return jsonify(WEATHER_DATA)
+
+
+def get_json(file_path):
+    with open(file_path, encoding="utf-8") as f:
+        return json.load(f)
+    
+
+@map_utils_bp.route('/api/wind_by_location')
+def wind_by_location():
+    lake_name = request.args.get("location")
+    
+    try:
+        lat, lon = lat_lon(lake_name)
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    
+    update_WEATHER_DATA(lat, lon)
+    return jsonify(WEATHER_DATA)
+
+
+def get_lake_data(app):
+    @app.context_processor
+    def injection():
+        return dict(loop_data = get_json(LAKE_FILE))
