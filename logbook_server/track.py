@@ -9,14 +9,14 @@ from werkzeug.utils import secure_filename
 from logbook_server.auth import login_required
 from logbook_server.db import get_db
 from logbook_server.map_utils import *
-import threading
-import time
-import jsonify
 
 img_path_arrow = './assets/blue-arrow-png.png'
 DWD_img = './assets/dwd-logo-png.png'
 UPLOAD_FOLDER = 'logbook_server/uploads/'
 ALLOWED_EXTENSIONS = {'gpx'}
+# default Werbellinsee
+latitude = 52.924095
+longitude = 13.713948
 
 bp = Blueprint('track', __name__, url_prefix='/track')
 
@@ -26,6 +26,9 @@ def allowed_file(filename):
 @bp.route('/')
 @login_required
 def index():
+    if g.user in None:
+        return redirect(url_for('auth.login'))
+    
     db = get_db()
     posts = list(db.tracks.find({"created_by": g.user["user_name"]}, {"file": 1, "created_by": 1, "title": 1, "description": 1}))
     maps = {}
@@ -42,42 +45,25 @@ def index():
     # print(the_map._repr_html_())
     return render_template('track/index.html',maps=maps, posts=posts)
 
-
-@bp.route('/api/wind') # creating a 
-def get_wind_data():
-    return jsonify({
-        'wind_speed': velocity,
-        'wind_direction': direction,
-        'compass_direction': compass,
-        'beaufort': beaufort
-    })
-
-
 @bp.route('/map')
 @login_required
 def map():
     
-    # default Werbellinsee
-    latitude = 52.924095
-    longitude = 13.713948
-    
     if latitude and longitude:
+        
         wind_arrow = encode_image(img_path_arrow)
         DWD_logo = encode_image(DWD_img)
-        
         map_data = builld_default_map(latitude, longitude)
-        wind_speed, wind_direction, compass_direction, getBeauforScale, direction = update_weather_data(latitude, longitude)
-        
+
         return render_template(
             'track/map.html', 
-            map_data=map_data._repr_html_(), 
-            wind_speed=wind_speed, 
-            wind_direction=wind_direction, 
-            compass_direction=compass_direction, 
-            direction=direction,
-            getBeauforScale=getBeauforScale, 
-            wind_arrow=wind_arrow, 
-            DWD_logo=DWD_logo)
+            map_data = map_data._repr_html_(),  
+            wind_speed = weather_data["wind_speed"], 
+            wind_direction = weather_data["wind_direction"], 
+            compass_direction = weather_data["compass_direction"], 
+            getBeauforScale = weather_data["beaufort"], 
+            wind_arrow = wind_arrow, 
+            DWD_logo = DWD_logo)
     return render_template('track/map.html')
 
 

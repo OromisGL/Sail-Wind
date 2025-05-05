@@ -2,7 +2,7 @@ import os
 
 from flask import Flask
 from .db import init_app
-
+import threading
 
 
 def create_app(test_config=None):
@@ -40,6 +40,12 @@ def create_app(test_config=None):
 
     from . import track
     app.register_blueprint(track.bp)
-    app.add_url_rule('/', endpoint='track.index')
-
+    app.add_url_rule('/', endpoint='track.map')
+    
+        # make the register for the Data Fetch here
+    from .map_utils import map_utils_bp, weather_updater
+    app.register_blueprint(map_utils_bp, url_prefix='/track')
+    
+    threading.Thread(target=weather_updater, daemon=True).start()
+    
     return app
