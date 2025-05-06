@@ -4,6 +4,7 @@ from gpxplotter.common import RELABEL
 from datetime import datetime  
 from wetterdienst import Settings
 from wetterdienst.provider.dwd.observation import DwdObservationRequest
+from wetterdienst.metadata.period import Period
 import polars as pl
 import folium
 from folium.plugins import FloatImage
@@ -15,8 +16,8 @@ from flask import flash, Blueprint, request, jsonify, json
 import zlib
 
 # default Werbellinsee
-LATITUDE = 52.924095
-LONGITUDE = 13.713948
+LATITUDE = 52.933333
+LONGITUDE = 13.716667
 
 WEATHER_DATA = {
     "wind_speed": None,
@@ -67,46 +68,69 @@ def build_map(path):
 #    print("end track")
 
 def station_request(lat, lon):
-    
+    """
+    Search for the Next DWD Weatherstation near the location at lat lon. 
+    Starts at radius 5km and increments by 5km until 30km.
+    When reaches 40km it breaks with Exception.
+    """
     location = (lat, lon)
+    distance_min = 5
+    distance_max = 40
+    step = 5
     
-    station = DwdObservationRequest(
-    parameters=("10_minutes", "wind"),
-    settings=settings
-    ).filter_by_distance(latlon=location, distance=30) # Station request with in a radius of 30 km
-    df = station.df.head()
-    station = df[0]
-    station_id = station.select("station_id").item() # Station Id for next request, can not access the data in on request 
-    
-    return station_id
+    while distance_min <= distance_max:
+        try:
+            station = DwdObservationRequest(
+            parameters=("10_minutes", "wind"), 
+            settings=settings).filter_by_distance(latlon=location, distance=distance_min) # Station request with in a radius of 30 km
+            
+            df = station.df
+            
+            if df.shape[0] == 0:
+                raise ImportError(f"Keine Station innerhalb {distance_min} km")
+            
+            first = station.df.head(1)[0]
+            
+            station_id = first.select("station_id").item()# Station Id for next request, can not access the data in on request
+            
+            return station_id
+        
+        except FileNotFoundError:
+            distance_min += step
+        
+        except Exception as e:
+            print(f"""station_request Fehler bei radius={distance_min}: {e}""")
+            distance_min += step
+            
+    raise RuntimeError(
+        f"""
+        Keine Station mit Winddaten gefunden im Umkreis bis {distance_max} km um {location}
+        """
+        )
 
-def wind_velo(station):
+def wind_data_fetch(station):
+    """
+    Loads in a requncy of 10 min all new wind Data from the Station.
+    Combines fetching wind speed and direction and gets the the most recent data.
+    """
     request = DwdObservationRequest(
         parameters=("10_minutes", "wind"),
-        settings=settings
+        periods=Period.RECENT,
+        settings=settings,
     ).filter_by_station_id(station_id=(station, )) # Get the Station Data
     
-    values = request.values.all().df
-    values = values.with_columns(pl.col("date").cast(pl.Utf8))  
-    values = values.with_columns(pl.col("date").str.to_datetime())
+    df = request.values.all().df
     
-    wind_speed = values.filter(pl.col("parameter") == "wind_speed").sort("date").tail(1).select("value").item()
+    latest = (
+        df.sort("date")
+        .group_by("parameter")
+        .agg(pl.last("value").alias("value"))
+    )
 
-    return wind_speed # wind speed in m/s
-
-def wind_direct(station):
-    request = DwdObservationRequest(
-        parameters=("10_minutes", "wind"),
-        settings=settings
-    ).filter_by_station_id(station_id=(station, ))
+    wind_speed = latest.filter(pl.col("parameter") == "wind_speed").select("value").item()
+    wind_direction = latest.filter(pl.col("parameter") == "wind_direction").select("value").item()
     
-    values = request.values.all().df
-    values = values.with_columns(pl.col("date").cast(pl.Utf8))  
-    values = values.with_columns(pl.col("date").str.to_datetime())
-    
-    wind_direction = values.filter(pl.col("parameter") == "wind_direction").sort("date").tail(1).select("value").item()
-
-    return wind_direction # direction in degree
+    return {"wind_speed": wind_speed, "wind_direction": wind_direction}
 
 def encode_image(image_path):
     with open(image_path, "rb") as image_file:
@@ -194,15 +218,15 @@ def update_WEATHER_DATA(lat, lon):
     global WEATHER_DATA 
     try:
         station = station_request(lat, lon)
-        velocity = wind_velo(station)
-        direction = wind_direct(station)
-        compass = wind_compass(direction)
-        beaufort = beafort(velocity)
+        latest = wind_data_fetch(station)
+        print(latest)
+        compass = wind_compass(latest["wind_direction"])
+        beaufort = beafort(latest["wind_speed"])
 
         # in globalen Cache schreiben
         WEATHER_DATA.update({
-            "wind_speed": velocity,
-            "wind_direction": direction,
+            "wind_speed": latest["wind_speed"],
+            "wind_direction": latest["wind_direction"],
             "compass_direction": compass,
             "beaufort": beaufort,
             "lat": lat,

@@ -48,9 +48,10 @@ def map():
         
         wind_arrow = encode_image(img_path_arrow)
         DWD_logo = encode_image(DWD_img)
-
+        initial_location_name = "Werbellinsee"
         return render_template(
             'track/map.html', 
+            initial_location_name = initial_location_name,
             LATITUDE=LATITUDE,
             LONGITUDE=LONGITUDE,  
             wind_speed = WEATHER_DATA["wind_speed"], 

@@ -8,6 +8,7 @@
 #map {
     width: 100vw !important;
     height: 100vh !important;
+    border-radius: 8px;
 }
 
 .map-post #post-map iframe {
