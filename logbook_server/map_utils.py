@@ -19,6 +19,7 @@ import zlib
 LATITUDE = 52.933333
 LONGITUDE = 13.716667
 
+# Dict for all relevant Data (at the moment) 
 WEATHER_DATA = {
     "wind_speed": None,
     "wind_direction": None,
@@ -28,13 +29,15 @@ WEATHER_DATA = {
     "lon": LONGITUDE
 }
 
-
+# using the os libary for getting file Paths
 THIS_DIR = os.path.dirname(__file__)
 PROJECT_ROOT = os.path.abspath(os.path.join(THIS_DIR, os.pardir))
 LAKE_FILE = os.path.join(PROJECT_ROOT, "assets", "lake_set.json")
 
+# instance of the map utils api 
 map_utils_bp = Blueprint('map_utils', __name__)
 
+# Settings wor Wetterdinst requests
 settings = Settings(
     ts_shape="long",         # Ausgabe als lange Tabelle
     ts_humanize=True,        # Parameter verständlicher anzeigen
@@ -50,7 +53,11 @@ linear = cm.LinearColormap(
 )
 linear.caption = RELABEL.get(color_by, color_by)
 
+
 def build_map(path):
+    """
+    Builds Folium Map with a Color linear for visulizing the speed in km/h.
+    """
     the_map = create_folium_map(tiles='openstreetmap')
     for track in read_gpx_file(path):
         for i, segment in enumerate(track['segments']):
@@ -66,6 +73,7 @@ def build_map(path):
 #for track in read_gpx_file('2022/2022-07-30_s_gelb_Steffen_elli.gpx'):
 #   print(track)
 #    print("end track")
+
 
 def station_request(lat, lon):
     """
@@ -87,7 +95,7 @@ def station_request(lat, lon):
             df = station.df
             
             if df.shape[0] == 0:
-                raise ImportError(f"Keine Station innerhalb {distance_min} km")
+                raise ImportError(f"Sation not in {distance_min} km")
             
             first = station.df.head(1)[0]
             
@@ -99,7 +107,7 @@ def station_request(lat, lon):
             distance_min += step
         
         except Exception as e:
-            print(f"""station_request Fehler bei radius={distance_min}: {e}""")
+            print(f"Search radius increments by 5km at {distance_min} km radius""")
             distance_min += step
             
     raise RuntimeError(
@@ -107,6 +115,7 @@ def station_request(lat, lon):
         Keine Station mit Winddaten gefunden im Umkreis bis {distance_max} km um {location}
         """
         )
+
 
 def wind_data_fetch(station):
     """
@@ -132,11 +141,19 @@ def wind_data_fetch(station):
     
     return {"wind_speed": wind_speed, "wind_direction": wind_direction}
 
+
 def encode_image(image_path):
+    """
+    Opens the wind arrow .png and encodes the file. 
+    """
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode()
     
+    
 def beafort(wind_speed):
+    """
+    Gets the value of the beaufort scale for Wind Speed visulization.
+    """
     if wind_speed <= 0.2:
         return 0
     if wind_speed <= 1.5:
@@ -164,7 +181,11 @@ def beafort(wind_speed):
     
     return 12
     
+
 def wind_compass(wind_direction):
+    """
+    Getting the compass-litterals from the wind direction in degrees.
+    """
     if wind_direction <= 10 or wind_direction in range(341, 361):
         return 'N'
     if wind_direction in range(11, 31):
@@ -197,16 +218,12 @@ def wind_compass(wind_direction):
         return 'NW'
     if wind_direction in range(321, 341):
         return 'N/NW'
-    
 
-def builld_default_map(LATITUDE, LONGITUDE):
-    the_map = create_folium_map(tiles='openstreetmap', max_bounds=True)
-    folium.Marker([LATITUDE, LONGITUDE], icon=folium.Icon(color='red')).add_to
-    the_map.fit_bounds([[LATITUDE - 0.035, LONGITUDE - 0.035],
-                        [LATITUDE + 0.035, LONGITUDE + 0.035]])
-    return the_map
 
 def lat_lon(lake_name):
+    """
+    extracting the lat and lon values based on the Lake Name from LAKE_FILE json.
+    """
     lakes = get_json(LAKE_FILE)
     for lake in lakes:
         if lake["name"] == lake_name:
@@ -214,7 +231,15 @@ def lat_lon(lake_name):
         
     raise ValueError(f"Lake {lake_name} not found.")
 
+
 def update_WEATHER_DATA(lat, lon):
+    """
+    Function Calls:
+    
+    [station_request, wind_data_fetch, wind_compass, beafort]
+    
+    After extractiong all the Data from the Function Calls the WEATHER_DATA global gets new Values.
+    """
     global WEATHER_DATA 
     try:
         station = station_request(lat, lon)
@@ -240,22 +265,34 @@ def update_WEATHER_DATA(lat, lon):
 
 
 def weather_updater():
+    """
+    Calls the Main Function. Is target of the Thread in __init__.py. Duaration 5 min for the next call.
+    """
     while True:
         update_WEATHER_DATA(WEATHER_DATA["lat"], WEATHER_DATA["lon"])
         time.sleep(300)  # alle 5 Minuten
 
 @map_utils_bp.route('/api/wind')
 def get_wind_data():
+    """
+    returns a json of the WEATHER_DATA Dict.
+    """
     return jsonify(WEATHER_DATA)
 
 
 def get_json(file_path):
+    """
+    Opens a json file.
+    """
     with open(file_path, encoding="utf-8") as f:
         return json.load(f)
     
 
 @map_utils_bp.route('/api/wind_by_location')
 def wind_by_location():
+    """
+    Asks for the Lake Name and returns the new weather Data for the new Location in a json. 
+    """
     lake_name = request.args.get("location")
     
     try:
@@ -270,4 +307,7 @@ def wind_by_location():
 def get_lake_data(app):
     @app.context_processor
     def injection():
+        """
+        Makes the data in Lake File json iterrable for the Javascript function loadWindData in static/script.js.
+        """
         return dict(loop_data = get_json(LAKE_FILE))

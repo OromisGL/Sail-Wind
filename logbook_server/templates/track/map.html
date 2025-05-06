@@ -34,7 +34,7 @@
 {% block scripts %}
     {{ super() }}
     <script>
-        // Inline-Variablen global setzen, bevor map.js lädt
+        // Inline-Variable Global-default Settings
         window.DEFAULT_LAT          = {{ LATITUDE }};
         window.DEFAULT_LON          = {{ LONGITUDE }};
         window.INITIAL_LAKE_NAME    = {{ initial_location_name|tojson }};

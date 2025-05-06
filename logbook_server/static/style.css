@@ -4,6 +4,12 @@
     will-change: auto !important;
 }
 
+.lake-button.active {
+    background-color: rgba(var(--bs-info-rgb),var(--bs-bg-opacity)) !important;
+    color: black !important;
+    border: none;
+}
+
 
 #map {
     width: 100vw !important;

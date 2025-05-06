@@ -20,6 +20,7 @@ bp = Blueprint('track', __name__, url_prefix='/track')
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS # checking for the right Filename
 
+
 @bp.route('/')
 @login_required
 def index():
@@ -39,6 +40,7 @@ def index():
                 flash(f"File Not found: {file_path}")
     # print(the_map._repr_html_())
     return render_template('track/index.html',maps=maps, posts=posts)
+
 
 @bp.route('/map')
 @login_required
@@ -110,6 +112,7 @@ def create():
         
     return render_template('track/create.html')
 
+
 def get_post(id, check_author=True):
     post = get_db().tracks.find_one({"_id": id})
 
@@ -120,6 +123,7 @@ def get_post(id, check_author=True):
         abort(403)
 
     return post
+
 
 @bp.route('/<string:id>/update', methods=('GET', 'POST'))
 @login_required
@@ -165,6 +169,7 @@ def update(id):
             return redirect(url_for('track.index'))
 
     return render_template('track/update.html', post=post)
+
 
 @bp.route('/<string:id>/delete', methods=('POST',))
 @login_required
