@@ -52,26 +52,78 @@ linear = cm.LinearColormap(
 )
 linear.caption = RELABEL.get(color_by, color_by)
 
+def extract_route(path):
+    """
+    Extracts the gps coordiantes from the gpx file. 
+    optimized for saving in bson format.
+    float cast on every lat, lon pair.
+    """
+    file = read_gpx_file(path)
+    segments = []
 
-def build_map(path):
+    for track in file:
+        for segment in track["segments"]:
+            
+            # cast the values to accessable floats
+            coords = [
+                (float(lat), float(lon))
+                for lat, lon in segment["latlon"]
+            ]
+
+            # Speed Tracking 
+            speeds = [
+                float(v)
+                for v in segment[color_by]
+            ]
+
+            segments.append({
+                "latlon": coords,
+                "speeds": speeds
+            })
+
+    return segments
+
+def build_map(segments):
     """
     Builds Folium Map with a Color linear for visulizing the speed in km/h.
+    Takes in a Dict with the safed Tracks.
     """
     the_map = create_folium_map(tiles='openstreetmap')
-    for track in read_gpx_file(path):
-        for i, segment in enumerate(track['segments']):
-            line = folium.ColorLine(positions=segment['latlon'], colormap=linear,
-                                    colors=segment[color_by][:-1], control=False, **line_options)
-            line.add_to(the_map)
+    
+    for seg in segments:
+        coords = seg["latlon"]
+        speeds = seg["speeds"]
+
+        # steps over the empty values
+        if speeds is None:
+            continue
+        
+        # for drawing the colored segments between the point properly 
+        if len(speeds) >= len(coords):
+            speeds = speeds[:-1]
+
+        # Draws the line to the Map
+        line = folium.ColorLine(
+            positions=coords,
+            colors=speeds,
+            colormap=linear,
+            control=False,
+            **line_options
+        )
+        line.add_to(the_map)
+        
+    # for track in read_gpx_file(path):
+    #     for i, segment in enumerate(track['segments']):
+    #         # print(f"segment {i}: first 5 points = {segment['latlon'][:5]}")
+    #         line = folium.ColorLine(positions=segment['latlon'], colormap=linear,
+    #                                 colors=segment[color_by][:-1], control=False, **line_options)
+    #         line.add_to(the_map)
     the_map.add_child(linear)
     boundary = the_map.get_bounds()
     the_map.fit_bounds(boundary, padding=(3, 3))
 
     # To display the map in a Jupyter notebook:
     return the_map
-#for track in read_gpx_file('2022/2022-07-30_s_gelb_Steffen_elli.gpx'):
-#   print(track)
-#    print("end track")
 
 
 def station_request(lat, lon):
@@ -118,7 +170,7 @@ def station_request(lat, lon):
 
 def wind_data_fetch(station):
     """
-    Loads in a requncy of 10 min all new wind Data from the Station.
+    Loads in a frequncy of 10 min all new wind Data from the Station.
     Combines fetching wind speed and direction and gets the the most recent data.
     """
     request = DwdObservationRequest(

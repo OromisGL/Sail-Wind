@@ -26,16 +26,17 @@ def allowed_file(filename):
 def index():
     
     db = get_db()
-    posts = list(db.tracks.find({"created_by": g.user["user_name"]}, {"file": 1, "created_by": 1, "title": 1, "description": 1}))
+    posts = list(db.tracks.find({"created_by": g.user["user_name"]}, {"file": 1, "created_by": 1, "title": 1, "description": 1, "segments": 1}))
     maps = {}
     
     for post in posts:
-        if "file" in post:
+        if "segments" in post:
             file_path = os.path.join(UPLOAD_FOLDER, post["file"])
+            segment = post["segments"]
             print(file_path)
             
             if os.path.exists(file_path):
-                maps[post["_id"]] =  build_map(file_path)._repr_html_()
+                maps[post["_id"]] =  build_map(segment)._repr_html_()
             else:
                 flash(f"File Not found: {file_path}")
     # print(the_map._repr_html_())
@@ -88,7 +89,7 @@ def create():
             # filename = filename + '.gpx'
             file_path = os.path.join(UPLOAD_FOLDER, filename)
             file.save(file_path)
-            
+            tracks = extract_route(file_path)
         else:
             error = 'File extension not allowed'
             
@@ -100,7 +101,8 @@ def create():
                 "created_by": g.user["user_name"],
                 "title": title,
                 "description": description,
-                "file": filename
+                "file": filename,
+                "segments": tracks
             }
             
             db = get_db()
