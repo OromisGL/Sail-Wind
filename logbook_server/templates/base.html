@@ -71,8 +71,10 @@
                             <hr>
                             {% for item in loop_data %}
                             <button
-                                class="list-group-item list-group-item-action lake-button"
-                                data-lake="{{ item.name|e }}">
+                                class="list-group-item list-group-item-action lake-button{% if loop.first %} active{% endif %}"
+                                data-lake="{{ item.name|e }}"
+                                data-lat="{{ item.latitude }}"
+                                data-lon="{{ item.longitude }}">
                                 {{ item.name }}
                             </button>
                             {% endfor %}

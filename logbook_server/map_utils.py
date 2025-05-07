@@ -15,19 +15,18 @@ import threading
 from flask import flash, Blueprint, request, jsonify, json
 import zlib
 
-# default Werbellinsee
-LATITUDE = 52.933333
-LONGITUDE = 13.716667
-
 # Dict for all relevant Data (at the moment) 
 WEATHER_DATA = {
     "wind_speed": None,
     "wind_direction": None,
     "compass_direction": None,
     "beaufort": None,
-    "lat": LATITUDE,
-    "lon": LONGITUDE
+    "lat": None,
+    "lon": None
 }
+
+LATITUDE = 52.93333
+LONGITUDE = 13.716667
 
 # using the os libary for getting file Paths
 THIS_DIR = os.path.dirname(__file__)
@@ -240,7 +239,8 @@ def update_WEATHER_DATA(lat, lon):
     
     After extractiong all the Data from the Function Calls the WEATHER_DATA global gets new Values.
     """
-    global WEATHER_DATA 
+    global WEATHER_DATA
+    
     try:
         station = station_request(lat, lon)
         latest = wind_data_fetch(station)
@@ -270,7 +270,16 @@ def weather_updater():
     """
     while True:
         update_WEATHER_DATA(WEATHER_DATA["lat"], WEATHER_DATA["lon"])
+        
+        # uses deafult while values are None, causes one run with default when refreshicng the Server
+        # works fine when doing it in the Browser. May be a better solution.
+        lat = WEATHER_DATA["lat"] or LATITUDE
+        lon = WEATHER_DATA["lon"] or LONGITUDE
+        
+        update_WEATHER_DATA(lat, lon)
+        print(WEATHER_DATA)
         time.sleep(300)  # alle 5 Minuten
+
 
 @map_utils_bp.route('/api/wind')
 def get_wind_data():
@@ -293,6 +302,7 @@ def wind_by_location():
     """
     Asks for the Lake Name and returns the new weather Data for the new Location in a json. 
     """
+    
     lake_name = request.args.get("location")
     
     try:
@@ -310,4 +320,5 @@ def get_lake_data(app):
         """
         Makes the data in Lake File json iterrable for the Javascript function loadWindData in static/script.js.
         """
+        print(dict(loop_data = get_json(LAKE_FILE)))
         return dict(loop_data = get_json(LAKE_FILE))

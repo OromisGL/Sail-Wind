@@ -46,23 +46,21 @@ def index():
 @login_required
 def map():
     
-    if LATITUDE and LONGITUDE:
-        
-        wind_arrow = encode_image(img_path_arrow)
-        DWD_logo = encode_image(DWD_img)
-        initial_location_name = "Werbellinsee"
-        return render_template(
-            'track/map.html', 
-            initial_location_name = initial_location_name,
-            LATITUDE=LATITUDE,
-            LONGITUDE=LONGITUDE,  
-            wind_speed = WEATHER_DATA["wind_speed"], 
-            wind_direction = WEATHER_DATA["wind_direction"], 
-            compass_direction = WEATHER_DATA["compass_direction"], 
-            getBeauforScale = WEATHER_DATA["beaufort"], 
-            wind_arrow = wind_arrow, 
-            DWD_logo = DWD_logo)
-    return render_template('track/map.html')
+    wind_arrow = encode_image(img_path_arrow)
+    DWD_logo = encode_image(DWD_img)
+    initial_location_name = "Werbellinsee"
+    return render_template(
+        'track/map.html', 
+        initial_location_name = initial_location_name,
+        LATITUDE=LATITUDE,
+        LONGITUDE=LONGITUDE,  
+        wind_speed = WEATHER_DATA["wind_speed"], 
+        wind_direction = WEATHER_DATA["wind_direction"], 
+        compass_direction = WEATHER_DATA["compass_direction"], 
+        getBeauforScale = WEATHER_DATA["beaufort"], 
+        wind_arrow = wind_arrow, 
+        DWD_logo = DWD_logo)
+
 
 
 @bp.route('/create', methods=('GET', 'POST'))

@@ -11,12 +11,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 {% endblock %}
 
-    <div id="map">
-
-        // Optional: direkt den ersten See laden
-        {% if initial_location_name %}
-        loadWindData({{ initial_location_name|tojson }});
-        {% endif %}
+    <!-- Dataset in the div tag -->
+    <div id="map"
+    data-default-lat="{{ LATITUDE }}"
+    data-default-lon="{{ LONGITUDE }}"
+    data-initial-lake="{{ initial_location_name|e }}"
+    style="width:100%; height:100%; position:relative;">
 
         <div id="wind-info">
             <p><b>Wind Data</b></p>
@@ -33,11 +33,5 @@
 
 {% block scripts %}
     {{ super() }}
-    <script>
-        // Inline-Variable Global-default Settings
-        window.DEFAULT_LAT          = {{ LATITUDE }};
-        window.DEFAULT_LON          = {{ LONGITUDE }};
-        window.INITIAL_LAKE_NAME    = {{ initial_location_name|tojson }};
-    </script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 {% endblock %}
