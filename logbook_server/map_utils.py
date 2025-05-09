@@ -56,7 +56,7 @@ def extract_route(path):
     """
     Extracts the gps coordiantes from the gpx file. 
     optimized for saving in bson format.
-    float cast on every lat, lon pair.
+    float cast on every lat, lon.
     """
     file = read_gpx_file(path)
     segments = []

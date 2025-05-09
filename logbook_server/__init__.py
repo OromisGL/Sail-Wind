@@ -42,6 +42,10 @@ def create_app(test_config=None):
     app.register_blueprint(track.bp)
     app.add_url_rule('/', endpoint='track.map')
     
+    from . import user
+    app.register_blueprint(user.bp)
+    app.add_url_rule('/', endpoint='user.profile')
+    
     # make the register for the Data Fetch here
     from .map_utils import map_utils_bp, weather_updater
     app.register_blueprint(map_utils_bp, url_prefix='/track')
